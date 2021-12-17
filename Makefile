@@ -6,21 +6,24 @@ CFLAGS = -Wall -Wextra -Werror -I minilibx -L minilibx_macos -lmlx -framework Op
 
 RM = rm -rf
 
-SRCS = 	srcs/fdf.c\
-        srcs/main.c\
-		srcs/parse.c\
+SRCS = 	src/fdf.c\
+        src/main.c\
+		src/parse.c\
         libft/libft.a\
 
-# SRCS_BONUS =     pipex_bonus.c\
-#                 libft/libft.a\
+SRCS_BONUS = src_bonus/fdf_bonus.c\
+        src_bonus/main_bonus.c\
+		src_bonus/parse_bonus.c\
+        libft/libft.a\
 
 $(NAME) :
 	make all -C libft
 	gcc $(CFLAGS) $(SRCS) -o $(NAME)
 
-# bonus :
-#     make all -C libft
-#     gcc -fsanitize=address $(CFLAGS) $(SRCS_BONUS) -o $(NAME)
+bonus :
+	make clean
+	make all -C libft
+	gcc $(CFLAGS) $(SRCS_BONUS) -o $(NAME)
 
 all : $(NAME)
 

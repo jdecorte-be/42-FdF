@@ -1,89 +1,95 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   get_next_line_utils.c                              :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: jdecorte <jdecorte@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/10/19 11:14:11 by jdecorte          #+#    #+#             */
-/*   Updated: 2021/10/19 11:32:26 by jdecorte         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "get_next_line.h"
 
-char	*ft_strjoin(char const *s1, char const *s2)
+size_t	ft_strlen(char *s)
 {
-	int		sizetotal;
-	char	*res;
-	int		i;
-	int		j;
+	int	len;
 
-	i = 0;
-	sizetotal = ft_strlen(s1) + ft_strlen(s2);
-	res = malloc(sizeof(char) * (sizetotal + 1));
-	if (!res || !s1 || !s2)
-		return (NULL);
-	while (s1[i] != 0)
+	len = 0;
+	while (*s != '\0')
 	{
-		res[i] = s1[i];
-		i++;
+		s++;
+		len++;
 	}
-	j = 0;
-	while (s2[j] != 0)
-	{
-		res[i] = s2[j];
-		i++;
-		j++;
-	}
-	res[sizetotal] = 0;
-	return (res);
+	return (len);
 }
 
-char	*ft_strchr(const char *string, int searchedChar )
+char	*ft_strdup(char *s1)
+{
+	char	*cpy;
+	int		pos;
+
+	cpy = (char *)malloc(ft_strlen(s1) + 1);
+	if (!cpy)
+		return (NULL);
+	pos = 0;
+	while (s1[pos])
+	{
+		cpy[pos] = s1[pos];
+		pos++;
+	}
+	cpy[pos] = '\0';
+	return (cpy);
+}
+
+char	*ft_strjoin(char *s1, char *s2)
 {
 	char	*str;
+	int		pos1;
+	int		pos2;
 
-	str = (char *)string;
-	while (*str != searchedChar && *str != 0)
+	if (!s1 || !s2)
+		return (NULL);
+	str = (char *)malloc(ft_strlen(s1) + ft_strlen(s2) + 1);
+	if (!str)
+		return (NULL);
+	pos1 = 0;
+	pos2 = 0;
+	while (s1 != NULL && s1[pos1] != '\0')
+	{
+		str[pos1] = s1[pos1];
+		pos1++;
+	}
+	while (s1 != NULL && s2[pos2] != '\0')
+	{
+		str[pos1 + pos2] = s2[pos2];
+		pos2++;
+	}
+	str[pos1 + pos2] = '\0';
+	return (str);
+}
+
+char	*ft_strchr(char *s, int c)
+{
+	char	*str;
+	char	char_c;
+
+	str = s;
+	char_c = (char) c;
+	while (*str != '\0')
+	{
+		if (*str == char_c)
+		{
+			return (str);
+		}
 		str++;
-	if (*str == searchedChar)
-		return (str);
-	else
-		return (NULL);
-}
-
-void	ft_bzero(void *s, size_t n)
-{
-	char	*str;
-	size_t	i;
-
-	str = (char *)s;
-	i = 0;
-	while (i < n)
-	{
-		str[i] = '\0';
-		i++;
 	}
+	return (NULL);
 }
 
-void	*ft_calloc(size_t elementCount, size_t elementSize)
+char	*ft_substr(char *s, unsigned int start, size_t len)
 {
-	char	*res;
+	char			*substr;
+	unsigned int	count;
 
-	res = malloc(elementSize * elementCount);
-	if (!res)
+	substr = malloc(len + 1);
+	if (!substr)
 		return (NULL);
-	ft_bzero(res, elementSize * elementCount);
-	return (res);
-}
-
-size_t	ft_strlen(const char *theString)
-{
-	int	i;
-
-	i = 0;
-	while (theString[i])
-		i++;
-	return (i);
+	count = 0;
+	while (count < len)
+	{
+		substr[count] = s[start + count];
+		count++;
+	}
+	substr[count] = '\0';
+	return (substr);
 }
