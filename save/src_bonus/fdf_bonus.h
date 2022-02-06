@@ -11,6 +11,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define MAX(a,b) (a > b ? a : b)
+#define MOD(a) ((a < 0) ? -a : a )
+#define MIN(a,b) (a < b ? a : b)
+
 typedef enum {false, true} bool;
 
 typedef struct s_img_data

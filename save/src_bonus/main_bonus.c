@@ -1,101 +1,121 @@
-#include "fdf_bonus.h"
-#define MAX(a,b) (a > b ? a : b)
-#define MOD(a) ((a < 0) ? -a : a )
-#define MIN(a,b) (a < b ? a : b)
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main_bonus.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: decortejohn <decortejohn@student.42.fr>    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/02/06 11:52:52 by decortejohn       #+#    #+#             */
+/*   Updated: 2022/02/06 12:10:49 by decortejohn      ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-void draw_background(t_fdf *tab, int color)
+#include "fdf_bonus.h"
+
+void	draw_background(t_fdf *tab, int color)
 {
-	int i;
-	for(int y = 0; y < 800; ++y)
-	for(int x = 0; x < 1000; ++x)
+	int	x;
+	int	y;
+	int	i;
+
+	i = 0;
+	y = 0;
+	while (++y < 800)
 	{
-		i = (x * tab->data.pixel_bits / 8) + (y * tab->data.line_bytes);
-		tab->data.img[i] = color;
-		tab->data.img[++i] = color >> 8;
-		tab->data.img[++i] = color >> 16;
+		x = 0;
+		while (++x < 1000)
+		{
+			i = (x * tab->data.pixel_bits / 8) + (y * tab->data.line_bytes);
+			tab->data.img[i] = color;
+			tab->data.img[++i] = color >> 8;
+			tab->data.img[++i] = color >> 16;
+		}
 	}
 }
 
 // pannel of commands
-void pannel(t_fdf *tab)
+void	pannel(t_fdf *tab)
 {
-	mlx_string_put (tab->p_mlx,tab->p_win, 20, 10, 0xB6B6B6 , "== COMMANDS ==");
-	mlx_string_put (tab->p_mlx,tab->p_win, 20, 30, 0xB6B6B6 , "A - Shift to left");
-	mlx_string_put (tab->p_mlx,tab->p_win, 20, 50, 0xB6B6B6 , "D - Shift to right");
-	mlx_string_put (tab->p_mlx,tab->p_win, 20, 70, 0xB6B6B6 , "P - Change projection");
-	if(tab->projection == false)
-		mlx_string_put (tab->p_mlx,tab->p_win, 20, 90, 0xB6B6B6 , "Mode - Isometric");
+	mlx_string_put (tab->p_mlx, tab->p_win, 20, 10, 0xFFFFFF, "<< COMMANDS >>");
+	mlx_string_put (tab->p_mlx, tab->p_win, 20, 30, 0xFFFFFF, "W - Move up");
+	mlx_string_put (tab->p_mlx, tab->p_win, 20, 50, 0xFFFFFF, "S - Move down");
+	mlx_string_put (tab->p_mlx, tab->p_win, 20, 70, 0xFFFFFF, "A - Move left");
+	mlx_string_put (tab->p_mlx, tab->p_win, 20, 90,
+		0xFFFFFF, "D - Move right");
+	mlx_string_put(tab->p_mlx, tab->p_win, 20, 110,
+		0xFFFFFF, "R - Increase depth");
+	mlx_string_put (tab->p_mlx, tab->p_win, 20, 130,
+		0xFFFFFF, "F - Decrease depth");
+	mlx_string_put (tab->p_mlx, tab->p_win, 20, 150,
+		0xFFFFFF, "E - Increase zoom");
+	mlx_string_put (tab->p_mlx, tab->p_win, 20, 170,
+		0xFFFFFF, "Q - Decrease zoom");
+	mlx_string_put (tab->p_mlx, tab->p_win, 20, 190,
+		0xFFFFFF, "< - Left rotation");
+	mlx_string_put (tab->p_mlx, tab->p_win, 20, 210,
+		0xFFFFFF, "> - Right rotation");
+	if (tab->projection == false)
+		mlx_string_put (tab->p_mlx, tab->p_win, 20, 230,
+			0xFFFFFF, "Mode - Isometric");
 	else
-		mlx_string_put (tab->p_mlx,tab->p_win, 20, 90, 0xB6B6B6 , "Mode - Cabinet");
+		mlx_string_put (tab->p_mlx, tab->p_win, 20, 230,
+			0xFFFFFF, "Mode - Cabinet");
 }
 
-void show_map(t_fdf *tab)
+void	show_map(t_fdf *tab)
 {
-	mlx_clear_window(tab->p_mlx,tab->p_win);
-
+	mlx_clear_window(tab->p_mlx, tab->p_win);
 	tab->img = mlx_new_image(tab->p_mlx, 1000, 800);
-	tab->data.img = mlx_get_data_addr(tab->img, &tab->data.pixel_bits, &tab->data.line_bytes, &tab->data.endian);
-	draw_background(tab, 0x141414);
+	tab->data.img = mlx_get_data_addr(tab->img, &tab->data.pixel_bits,
+			&tab->data.line_bytes, &tab->data.endian);
+	draw_background(tab, 0x181C26);
 	tracing(tab);
 	mlx_put_image_to_window(tab->p_mlx, tab->p_win, tab->img, 0, 0);
+	pannel(tab);
 }
 
 // keys handling
-int event(int key,t_fdf *tab)
+int	event(int key, t_fdf *tab)
 {
-
-	// esc to quit
 	if (key == 53)
-		mlx_destroy_window(tab->p_mlx,tab->p_win);
-	// zoom +
+		mlx_destroy_window(tab->p_mlx, tab->p_win);
 	if (key == 14)
 		tab->zoom += 2;
-	// zoom -
 	if (key == 12 && tab->zoom - 2 >= 2)
 		tab->zoom -= 2;
-	// left
 	if (key == 0)
 		tab->h_move += 20;
-	// right
 	if (key == 2)
 		tab->h_move -= 20;
-	// up
 	if (key == 13)
 		tab->v_move += 20;
-	// down
 	if (key == 1)
 		tab->v_move -= 20;
-	// projection
 	if (key == 35)
 	{
-		if(tab->projection == false)
+		if (tab->projection == false)
 			tab->projection = true;
 		else
 			tab->projection = false;
 	}
-	// up
 	if (key == 15)
 		tab->h_view += 0.01;
-	// down
 	if (key == 3)
 		tab->h_view -= 0.01;
 	if (key == 123)
 		tab->rotation -= 0.1;
 	if (key == 124)
 		tab->rotation += 0.1;
-	printf("%d\n", key);
 	show_map(tab);
-	return 0;
+	return (0);
 }
 
-
-// main
-int main(int ac, char **ag)
+int	main(int ac, char **ag)
 {
-	if(ac != 2)
-		printf("ERROR\n");
-	t_fdf *tab;
+	t_fdf	*tab;
 
+	if (ac != 2)
+		ft_putstr_fd("ERROR\n", 2);
 	tab = malloc(sizeof(t_fdf));
 	tab->projection = false;
 	tab->rotation = 0;
@@ -109,10 +129,7 @@ int main(int ac, char **ag)
 	tab->p_win = mlx_new_window(tab->p_mlx, 1000, 800, ag[1]);
 	tab->zoom = MAX(1000 / tab->width, 2);
 	show_map(tab);
-	printf("%d %d\n", tab->width, tab->height);
 	mlx_do_key_autorepeaton(tab->p_mlx);
 	mlx_hook(tab->p_win, 2, (1L << 0), event, tab);
 	mlx_loop(tab->p_mlx);
 }
-
-// gcc -Wall -Wextra -Werror -I minilibx -L minilibx_macos -lmlx -framework OpenGL -framework AppKit fdf.c main.c parse.c libft/libft.a 
