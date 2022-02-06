@@ -4,22 +4,65 @@
 #define MIN(a,b) (a < b ? a : b)
 #define MOD(a) ((a < 0) ? -a : a )
 
-void projection(float *x, float *y, int z, t_fdf *tab)
+
+int	fade(int h)
 {
+	if (h > 100)
+		return (0xFFDF8D);
+	if (h > 75)
+		return (0xFFDE7A);
+	if (h > 50)
+		return (0xFFC568);
+	if (h > 25)
+		return (0xFD996B);
+	if (h > 15)
+		return (0xF7856C);
+	if (h > 10)
+		return (0xF06E6C);
+	if (h > 5)
+		return (0xD9576B);
+	if (h > 0)
+		return (0xA44369);
+	if (h > -10)
+		return (0x833F68);
+	if (h > -20)
+		return (0x833F68);
+	if (h > -50)
+		return (0x5E3C65);
+	return (0x3F3A63);
+}
+
+void projection(float *x, float *y, int *z, t_fdf *tab)
+{
+	int x_tmp = *x;
+	int y_tmp = *y;
+
+	// rotation
+	*x = (x_tmp - tab->width * 1.5) * cos(tab->rotation) - (y_tmp - tab->height * 1.5) * sin(tab->rotation);
+	*y = (x_tmp - tab->width * 1.5) * sin(tab->rotation) + (y_tmp - tab->height * 1.5) * cos(tab->rotation);
+
 	// isometric projection
 	if(tab->projection == false)
 	{
 		*x = (*x - *y) * cos(0.8);
-		*y = (*x + *y) * sin(0.8) - z;
+		*y = (*x + *y) * sin(0.8) - *z;
 	}
 	// cabinet projection
 	else
 	{
-		*x = *x + 0.5 * z * cos(0.8);
-		*y = *y + 0.5 * z * sin(0.8);
-		*x = *x * cos(0.8 + tab->rotation) - *y * sin(0.8 + tab->rotation);
-		*y = *x * sin(0.8) + *y * cos(0.8) - z;
+		*x = *x + 0.5 * cos(-1) * *z;
+		*y = *y+ 0.5 * sin(-1) * *z;
 	}
+}
+
+void put_pxl(t_fdf *tab, int x, int y, int color)
+{
+	int		i;
+
+	i = (x * tab->data.pixel_bits / 8) + (y * tab->data.line_bytes);
+	tab->data.img[i] = color;
+	tab->data.img[++i] = color >> 8;
+	tab->data.img[++i] = color >> 16;
 }
 
 void	trace_line(float x0, float y0, float x1, float y1,t_fdf *tab)
@@ -32,14 +75,16 @@ void	trace_line(float x0, float y0, float x1, float y1,t_fdf *tab)
 	y0 *= tab->zoom;
 	x1 *= tab->zoom;
 	y1 *= tab->zoom;
+	z0 *= tab->zoom;
+	z1 *= tab->zoom;
 
 // adaptation
 	z0 *= tab->h_view;
 	z1 *= tab->h_view;
 
 // projection
-	projection(&x0,&y0,z0,tab);
-	projection(&x1,&y1,z1,tab);
+	projection(&x0,&y0,&z0,tab);
+	projection(&x1,&y1,&z1,tab);
 
 // allignement
 	x0 += tab->h_move;
@@ -54,11 +99,14 @@ void	trace_line(float x0, float y0, float x1, float y1,t_fdf *tab)
 	y_step /= max;
 	while((int)(x0 - x1) || (int)(y0 - y1))
 	{
-		mlx_pixel_put(tab->p_mlx, tab->p_win, x0, y0, 0xBAFFE8 + 100 * MAX(MOD(z1),MOD(z0)));
+		if(x0 < 1000 && y0 < 800 && x0 > 0 && y0 > 0)
+			put_pxl(tab, x0, y0, fade(MAX(z0,z1)));
 		x0 += x_step;
 		y0 += y_step;
 	}
 }
+
+
 
 //draw all point
 void tracing(t_fdf *tab)

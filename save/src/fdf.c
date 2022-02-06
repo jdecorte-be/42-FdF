@@ -5,6 +5,7 @@
 
 void projection(float *x, float *y, int z, t_fdf *tab)
 {
+	(void)tab;
 	// isometric projection
 	*x = (*x - *y) * cos(0.8);
 	*y = (*x + *y) * sin(0.8) - z;
@@ -58,7 +59,7 @@ void	trace_line(float x0, float y0, float x1, float y1,t_fdf *tab)
 	y_step /= max;
 	while((int)(x0 - x1) || (int)(y0 - y1))
 	{
-		mlx_pixel_put(tab->p_mlx, tab->p_win, x0, y0, tab->color);
+		put_pxl(tab, x0, y0, 0xABCDEF);
 		x0 += x_step;
 		y0 += y_step;
 	}

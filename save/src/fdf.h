@@ -15,6 +15,7 @@ typedef enum {false, true} bool;
 
 typedef struct s_fdf
 {
+	void	*img;
 	void 	*p_mlx;
 	void	*p_win;
 	char	**ag;

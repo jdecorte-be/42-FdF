@@ -2,7 +2,7 @@ NAME = fdf
 
 CC = gcc
 
-CFLAGS = -Wall -Wextra -Werror -I minilibx -L minilibx_macos -lmlx -framework OpenGL -framework AppKit
+CFLAGS = -Wall -Wextra -Werror -I minilibx -L minilibx_macos -lmlx -framework OpenGL -framework AppKit -fsanitize=address -g
 
 RM = rm -rf
 

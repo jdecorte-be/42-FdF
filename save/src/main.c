@@ -1,6 +1,5 @@
 #include "fdf.h"
 
-
 // pannel of commands
 void pannel(t_fdf *tab)
 {
@@ -65,9 +64,11 @@ int event(int key,t_fdf *tab)
 	// down
 	if (key == 3)
 		tab->h_view -= 2;
+	tab->img = mlx_new_image(tab->p_mlx, 1000, 700);
 	mlx_clear_window(tab->p_mlx,tab->p_win);
 	pannel(tab);
 	tracing(tab);
+	mlx_put_image_to_window(tab->p_mlx, tab->p_win, tab->img, 0, 0);
 	printf("%d \n", key);
 	return 0;
 }
@@ -89,13 +90,60 @@ int main(int ac, char **ag)
 		tab->ag = ag;
 		tab->p_mlx = mlx_init();
 		tab->p_win = mlx_new_window(tab->p_mlx, 1000, 700, "jdecorte - FdF");
+		tab->img = mlx_new_image(tab->p_mlx, 1000, 700);
 		readfile(tab);
 		pannel(tab);
 		tracing(tab);
 		mlx_do_key_autorepeaton(tab->p_mlx);
 		mlx_key_hook(tab->p_win, event, tab);
+		mlx_put_image_to_window(tab->p_mlx, tab->p_win, tab->img, 0, 0);
 		mlx_loop(tab->p_mlx);
 	}
 }
 
+// int main()
+// {
+// 	void *mlx = mlx_init();
+//     void *win = mlx_new_window(mlx, 640, 360, "Tutorial Window - Create Image");
+
+//     void *image = mlx_new_image(mlx, 640, 360);
+	
+// 	int pixel_bits;
+// 	int line_bytes;
+// 	int endian;
+// 	char *buffer = mlx_get_data_addr(image, &pixel_bits, &line_bytes, &endian);
+
+
+//     int color = 0xABCDEF;
+
+
+
+// 	for(int y = 0; y < 360; ++y)
+// 		for(int x = 0; x < 640; ++x)
+// 		{
+// 			int pixel = (y * line_bytes) + (x * 4);
+
+// 			if (endian == 1)        // Most significant (Alpha) byte first
+// 			{
+// 				buffer[pixel + 0] = (color >> 24);
+// 				buffer[pixel + 1] = (color >> 16) & 0xFF;
+// 				buffer[pixel + 2] = (color >> 8) & 0xFF;
+// 				buffer[pixel + 3] = (color) & 0xFF;
+// 			}
+// 			else if (endian == 0)   // Least significant (Blue) byte first
+// 			{
+// 				buffer[pixel + 0] = (color) & 0xFF;
+// 				buffer[pixel + 1] = (color >> 8) & 0xFF;
+// 				buffer[pixel + 2] = (color >> 16) & 0xFF;
+// 				buffer[pixel + 3] = (color >> 24);
+// 			}
+// 		}
+// 	mlx_put_image_to_window(mlx, win, image, 0, 0);
+
+
+
+
+
+//     mlx_loop(mlx);
+// }
 // gcc -Wall -Wextra -Werror -I minilibx -L minilibx_macos -lmlx -framework OpenGL -framework AppKit fdf.c main.c parse.c libft/libft.a 

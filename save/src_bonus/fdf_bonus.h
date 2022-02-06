@@ -13,25 +13,37 @@
 
 typedef enum {false, true} bool;
 
+typedef struct s_img_data
+{
+	int pixel_bits;
+	int line_bytes;
+	int endian;
+	char *img;
+}	t_img_data;
+
 typedef struct s_fdf
 {
+	t_img_data data;
+	t_img_data back_data;
+	void *background;
+	void	*img;
 	void 	*p_mlx;
 	void	*p_win;
 	char	**ag;
 	int height;
 	int width;
 	int **map;
-	int zoom;
+	float zoom;
 	int color;
 	int h_move;
 	int v_move;
 	bool projection;
-	int h_view;
+	float h_view;
 	float rotation;
 	int flip;
 }		t_fdf;
 
-
+void put_pxl(t_fdf *tab, int x, int y, int color);
 char	*get_next_line(int fd);
 int	ft_isdigit(int character);
 void readfile(t_fdf *tab);
