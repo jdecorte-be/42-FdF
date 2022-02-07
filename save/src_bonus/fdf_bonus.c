@@ -1,9 +1,16 @@
-#include "fdf_bonus.h"
-#include <math.h>
-#define MAX(a,b) (a > b ? a : b)
-#define MIN(a,b) (a < b ? a : b)
-#define MOD(a) ((a < 0) ? -a : a )
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   fdf_bonus.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: decortejohn <decortejohn@student.42.fr>    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/02/06 16:54:51 by decortejohn       #+#    #+#             */
+/*   Updated: 2022/02/06 21:45:59 by decortejohn      ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
+#include "fdf_bonus.h"
 
 int	fade(int h)
 {
@@ -32,30 +39,35 @@ int	fade(int h)
 	return (0x3F3A63);
 }
 
-void projection(float *x, float *y, int *z, t_fdf *tab)
+void	projection(float *x, float *y, int *z, t_fdf *tab)
 {
-	int x_tmp = *x;
-	int y_tmp = *y;
+	int	x_tmp;
+	int	y_tmp;
 
-	// rotation
-	*x = (x_tmp - tab->width * 1.5) * cos(tab->rotation) - (y_tmp - tab->height * 1.5) * sin(tab->rotation);
-	*y = (x_tmp - tab->width * 1.5) * sin(tab->rotation) + (y_tmp - tab->height * 1.5) * cos(tab->rotation);
-
-	// isometric projection
-	if(tab->projection == false)
+	*z = tab->map[(int)*y][(int)*x];
+	*z *= tab->zoom;
+	*z *= tab->h_view;
+	*y *= tab->zoom;
+	*x *= tab->zoom;
+	y_tmp = *y;
+	x_tmp = *x;
+	*x = (x_tmp - tab->width * 1.5) * cos(tab->rotation)
+		- (y_tmp - tab->height * 1.5) * sin(tab->rotation);
+	*y = (x_tmp - tab->width * 1.5) * sin(tab->rotation)
+		+ (y_tmp - tab->height * 1.5) * cos(tab->rotation);
+	if (tab->projection == false)
 	{
 		*x = (*x - *y) * cos(0.8);
 		*y = (*x + *y) * sin(0.8) - *z;
 	}
-	// cabinet projection
 	else
 	{
 		*x = *x + 0.5 * cos(-1) * *z;
-		*y = *y+ 0.5 * sin(-1) * *z;
+		*y = *y + 0.5 * sin(-1) * *z;
 	}
 }
 
-void put_pxl(t_fdf *tab, int x, int y, int color)
+void	put_pxl(t_fdf *tab, int x, int y, int color)
 {
 	int		i;
 
@@ -65,64 +77,57 @@ void put_pxl(t_fdf *tab, int x, int y, int color)
 	tab->data.img[++i] = color >> 16;
 }
 
-void	trace_line(float x0, float y0, float x1, float y1,t_fdf *tab)
+void	trace_line(float x0, float y0, t_fdf *tab)
 {
-// isometric projection
-	int z0 = tab->map[(int)y0][(int)x0];
-	int z1 = tab->map[(int)y1][(int)x1];
-// zoom
-	x0 *= tab->zoom;
-	y0 *= tab->zoom;
-	x1 *= tab->zoom;
-	y1 *= tab->zoom;
-	z0 *= tab->zoom;
-	z1 *= tab->zoom;
+	int		z0;
+	int		z1;
+	float	x_step;
+	float	y_step;
+	int		max;
 
-// adaptation
-	z0 *= tab->h_view;
-	z1 *= tab->h_view;
-
-// projection
-	projection(&x0,&y0,&z0,tab);
-	projection(&x1,&y1,&z1,tab);
-
-// allignement
+	projection(&x0, &y0, &z0, tab);
+	projection(&tab->x1, &tab->y1, &z1, tab);
 	x0 += tab->h_move;
 	y0 += tab->v_move;
-	x1 += tab->h_move;
-	y1 += tab->v_move;
-	
-	float x_step = x1 - x0;
-	float y_step = y1 - y0;
-	int max = MAX(MOD(x_step), MOD(y_step));
+	tab->x1 += tab->h_move;
+	tab->y1 += tab->v_move;
+	x_step = tab->x1 - x0;
+	y_step = tab->y1 - y0;
+	max = find_max(find_mod(x_step), find_mod(y_step));
 	x_step /= max;
 	y_step /= max;
-	while((int)(x0 - x1) || (int)(y0 - y1))
+	while ((int)(x0 - tab->x1) || (int)(y0 - tab->y1))
 	{
-		if(x0 < 1000 && y0 < 800 && x0 > 0 && y0 > 0)
-			put_pxl(tab, x0, y0, fade(MAX(z0,z1)));
+		if (x0 < 1000 && y0 < 800 && x0 > 0 && y0 > 0)
+			put_pxl(tab, x0, y0, fade(find_max(z0, z1)));
 		x0 += x_step;
 		y0 += y_step;
 	}
 }
 
-
-
-//draw all point
-void tracing(t_fdf *tab)
+void	tracing(t_fdf *tab)
 {
-	int i = 0;
-	int j;
+	int	i;
+	int	j;
 
-	while(i < tab->height)
+	i = 0;
+	while (i < tab->height)
 	{
 		j = 0;
-		while(j < tab->width)
+		while (j < tab->width)
 		{
 			if (j < tab->width - 1)
-				trace_line(j, i, j + 1, i, tab);
+			{
+				tab->x1 = j + 1;
+				tab->y1 = i;
+				trace_line(j, i, tab);
+			}
 			if (i < tab->height - 1)
-				trace_line(j, i, j , i  + 1, tab);
+			{
+				tab->x1 = j;
+				tab->y1 = i + 1;
+				trace_line(j, i, tab);
+			}
 			j++;
 		}
 		i++;

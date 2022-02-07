@@ -6,7 +6,7 @@
 /*   By: decortejohn <decortejohn@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/06 11:52:52 by decortejohn       #+#    #+#             */
-/*   Updated: 2022/02/06 12:10:49 by decortejohn      ###   ########.fr       */
+/*   Updated: 2022/02/06 18:18:45 by decortejohn      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,6 @@ void	draw_background(t_fdf *tab, int color)
 	}
 }
 
-// pannel of commands
 void	pannel(t_fdf *tab)
 {
 	mlx_string_put (tab->p_mlx, tab->p_win, 20, 10, 0xFFFFFF, "<< COMMANDS >>");
@@ -74,11 +73,13 @@ void	show_map(t_fdf *tab)
 	pannel(tab);
 }
 
-// keys handling
 int	event(int key, t_fdf *tab)
 {
 	if (key == 53)
+	{
 		mlx_destroy_window(tab->p_mlx, tab->p_win);
+		exit(0);
+	}
 	if (key == 14)
 		tab->zoom += 2;
 	if (key == 12 && tab->zoom - 2 >= 2)
@@ -91,21 +92,7 @@ int	event(int key, t_fdf *tab)
 		tab->v_move += 20;
 	if (key == 1)
 		tab->v_move -= 20;
-	if (key == 35)
-	{
-		if (tab->projection == false)
-			tab->projection = true;
-		else
-			tab->projection = false;
-	}
-	if (key == 15)
-		tab->h_view += 0.01;
-	if (key == 3)
-		tab->h_view -= 0.01;
-	if (key == 123)
-		tab->rotation -= 0.1;
-	if (key == 124)
-		tab->rotation += 0.1;
+	key_p2(key, tab);
 	show_map(tab);
 	return (0);
 }
@@ -115,19 +102,18 @@ int	main(int ac, char **ag)
 	t_fdf	*tab;
 
 	if (ac != 2)
-		ft_putstr_fd("ERROR\n", 2);
+		exit(-1);
 	tab = malloc(sizeof(t_fdf));
 	tab->projection = false;
 	tab->rotation = 0;
 	tab->h_view = 0.01;
-	tab->flip = 1;
 	tab->h_move = 500;
 	tab->v_move = 50;
 	tab->ag = ag;
 	tab->p_mlx = mlx_init();
 	readfile(tab);
 	tab->p_win = mlx_new_window(tab->p_mlx, 1000, 800, ag[1]);
-	tab->zoom = MAX(1000 / tab->width, 2);
+	tab->zoom = find_max(1000 / tab->width, 2);
 	show_map(tab);
 	mlx_do_key_autorepeaton(tab->p_mlx);
 	mlx_hook(tab->p_win, 2, (1L << 0), event, tab);

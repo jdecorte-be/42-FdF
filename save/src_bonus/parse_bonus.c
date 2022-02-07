@@ -6,13 +6,12 @@
 /*   By: decortejohn <decortejohn@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/06 12:17:01 by decortejohn       #+#    #+#             */
-/*   Updated: 2022/02/06 12:40:37 by decortejohn      ###   ########.fr       */
+/*   Updated: 2022/02/06 18:05:28 by decortejohn      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "fdf_bonus.h"
 
-// get height
 int	getheight(t_fdf *tab)
 {
 	int		fd;
@@ -32,8 +31,7 @@ int	getheight(t_fdf *tab)
 	return (i);
 }
 
-// get weight
-int	getweight(t_fdf *tab)
+int	getwidth(t_fdf *tab)
 {
 	int		fd;
 	char	**s_str;
@@ -46,18 +44,17 @@ int	getweight(t_fdf *tab)
 		exit(-1);
 	while (s_str[i])
 		i++;
-	free(s_str);
+	ft_free_tab(s_str);
 	close(fd);
 	return (i);
 }
 
-// malloc file
 int	**mallocfile(t_fdf *tab)
 {
 	int	**res;
 	int	i;
 
-	tab->width = getweight(tab);
+	tab->width = getwidth(tab);
 	tab->height = getheight(tab);
 	res = malloc(sizeof(int *) * tab->height);
 	i = 0;
@@ -69,17 +66,15 @@ int	**mallocfile(t_fdf *tab)
 	return (res);
 }
 
-// read file and return int**
 void	readfile(t_fdf *tab)
 {
-	int		**file;
-	int		fd;
 	char	*str;
+	char	**s_str;
+	int		fd;
 	int		j;
 	int		i;
-	char	**s_str;
 
-	file = mallocfile(tab);
+	tab->map = mallocfile(tab);
 	fd = open(tab->ag[1], O_RDONLY);
 	str = get_next_line(fd);
 	j = 0;
@@ -89,13 +84,13 @@ void	readfile(t_fdf *tab)
 		i = 0;
 		while (i < tab->width)
 		{
-			file[j][i] = ft_atoi(s_str[i]);
+			tab->map[j][i] = ft_atoi(s_str[i]);
 			i++;
 		}
+		free(str);
+		ft_free_tab(s_str);
 		str = get_next_line(fd);
-		free(s_str);
 		j++;
 	}
-	tab->map = file;
 	close(fd);
 }

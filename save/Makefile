@@ -1,19 +1,27 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: decortejohn <decortejohn@student.42.fr>    +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2022/02/07 17:05:27 by decortejohn       #+#    #+#              #
+#    Updated: 2022/02/07 17:05:28 by decortejohn      ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
 NAME = fdf
 
 CC = gcc
 
-CFLAGS = -Wall -Wextra -Werror -I minilibx -L minilibx_macos -lmlx -framework OpenGL -framework AppKit -fsanitize=address -g
+CFLAGS = -Wall -Wextra -Werror -I minilibx -L minilibx_macos -lmlx -framework OpenGL -framework AppKit
 
 RM = rm -rf
 
-SRCS = 	src/fdf.c\
-        src/main.c\
-		src/parse.c\
+SRCS = 	src/*.c\
         libft/libft.a\
 
-SRCS_BONUS = src_bonus/fdf_bonus.c\
-        src_bonus/main_bonus.c\
-		src_bonus/parse_bonus.c\
+SRCS_BONUS = src_bonus/*.c\
         libft/libft.a\
 
 $(NAME) :

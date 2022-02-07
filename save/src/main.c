@@ -1,149 +1,107 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: decortejohn <decortejohn@student.42.fr>    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/02/06 11:52:52 by decortejohn       #+#    #+#             */
+/*   Updated: 2022/02/07 16:50:12 by decortejohn      ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "fdf.h"
 
-// pannel of commands
-void pannel(t_fdf *tab)
+void	draw_background(t_fdf *tab, int color)
 {
-	// int i = 0;
-	// int j;
-	// while (i < 700)
-	// {
-	// 	j = 0;
-	// 	while(j < 1000)
-	// 	{
-	// 		mlx_pixel_put(tab->p_mlx, tab->p_win, j, i, 0x1B1B1B);
-	// 		j++;
-	// 	}
-	// 	i++;
-	// }
+	int	x;
+	int	y;
+	int	i;
 
-	mlx_string_put (tab->p_mlx,tab->p_win, 20, 10, 0xB6B6B6 , "== COMMANDS ==");
-	mlx_string_put (tab->p_mlx,tab->p_win, 20, 30, 0xB6B6B6 , "A - Shift to left");
-	mlx_string_put (tab->p_mlx,tab->p_win, 20, 50, 0xB6B6B6 , "D - Shift to right");
-	mlx_string_put (tab->p_mlx,tab->p_win, 20, 70, 0xB6B6B6 , "P - Change projection");
-	if(tab->projection == false)
-		mlx_string_put (tab->p_mlx,tab->p_win, 20, 90, 0xB6B6B6 , "Mode - Isometric");
-	else
-		mlx_string_put (tab->p_mlx,tab->p_win, 20, 90, 0xB6B6B6 , "Mode - Cabinet");
+	i = 0;
+	y = 0;
+	while (++y < 800)
+	{
+		x = 0;
+		while (++x < 1000)
+		{
+			i = (x * tab->data.pixel_bits / 8) + (y * tab->data.line_bytes);
+			tab->data.img[i] = color;
+			tab->data.img[++i] = color >> 8;
+			tab->data.img[++i] = color >> 16;
+		}
+	}
 }
 
-// keys handling
-int event(int key,t_fdf *tab)
+void	pannel(t_fdf *tab)
 {
-	// esc to quit
-	if (key == 53)
-		mlx_destroy_window(tab->p_mlx,tab->p_win);
-	// zoom +
-	if (key == 14)
-		tab->zoom += 10;
-	// zoom -
-	if (key == 12 && tab->zoom - 10 > 0)
-		tab->zoom -= 10;
-	// left
-	if (key == 0)
-		tab->h_move += 50;
-	// right
-	if (key == 2)
-		tab->h_move -= 50;
-	// up
-	if (key == 13)
-		tab->v_move += 50;
-	// down
-	if (key == 1)
-		tab->v_move -= 50;
-	// projection
-	if (key == 35)
-	{
-		if(tab->projection == false)
-			tab->projection = true;
-		else
-			tab->projection = false;
-	}
-	// up
-	if (key == 15)
-		tab->h_view += 2;
-	// down
-	if (key == 3)
-		tab->h_view -= 2;
-	tab->img = mlx_new_image(tab->p_mlx, 1000, 700);
-	mlx_clear_window(tab->p_mlx,tab->p_win);
-	pannel(tab);
+	mlx_string_put (tab->p_mlx, tab->p_win, 20, 10, 0xFFFFFF, "<< COMMANDS >>");
+	mlx_string_put (tab->p_mlx, tab->p_win, 20, 30, 0xFFFFFF, "W - Move up");
+	mlx_string_put (tab->p_mlx, tab->p_win, 20, 50, 0xFFFFFF, "S - Move down");
+	mlx_string_put (tab->p_mlx, tab->p_win, 20, 70, 0xFFFFFF, "A - Move left");
+	mlx_string_put (tab->p_mlx, tab->p_win, 20, 90,
+		0xFFFFFF, "D - Move right");
+	mlx_string_put(tab->p_mlx, tab->p_win, 20, 110,
+		0xFFFFFF, "R - Increase depth");
+	mlx_string_put (tab->p_mlx, tab->p_win, 20, 130,
+		0xFFFFFF, "F - Decrease depth");
+	mlx_string_put (tab->p_mlx, tab->p_win, 20, 150,
+		0xFFFFFF, "> - Right rotation");
+}
+
+void	show_map(t_fdf *tab)
+{
+	mlx_clear_window(tab->p_mlx, tab->p_win);
+	tab->img = mlx_new_image(tab->p_mlx, 1000, 800);
+	tab->data.img = mlx_get_data_addr(tab->img, &tab->data.pixel_bits,
+			&tab->data.line_bytes, &tab->data.endian);
+	draw_background(tab, 0x181C26);
 	tracing(tab);
 	mlx_put_image_to_window(tab->p_mlx, tab->p_win, tab->img, 0, 0);
-	printf("%d \n", key);
-	return 0;
+	pannel(tab);
 }
 
-
-// main
-int main(int ac, char **ag)
+int	event(int key, t_fdf *tab)
 {
-	if(ac == 2)
+	if (key == 53)
 	{
-		t_fdf *tab;
-
-		tab = malloc(sizeof(t_fdf));
-		tab->projection = false;
-		tab->h_view = 2;
-		tab->h_move = 700;
-		tab->v_move = 200;
-		tab->zoom = 20;
-		tab->ag = ag;
-		tab->p_mlx = mlx_init();
-		tab->p_win = mlx_new_window(tab->p_mlx, 1000, 700, "jdecorte - FdF");
-		tab->img = mlx_new_image(tab->p_mlx, 1000, 700);
-		readfile(tab);
-		pannel(tab);
-		tracing(tab);
-		mlx_do_key_autorepeaton(tab->p_mlx);
-		mlx_key_hook(tab->p_win, event, tab);
-		mlx_put_image_to_window(tab->p_mlx, tab->p_win, tab->img, 0, 0);
-		mlx_loop(tab->p_mlx);
+		mlx_destroy_window(tab->p_mlx, tab->p_win);
+		exit(0);
 	}
+	if (key == 0)
+		tab->h_move += 20;
+	if (key == 2)
+		tab->h_move -= 20;
+	if (key == 13)
+		tab->v_move += 20;
+	if (key == 1)
+		tab->v_move -= 20;
+	if (key == 15)
+		tab->h_view += 0.01;
+	if (key == 3)
+		tab->h_view -= 0.01;
+	show_map(tab);
+	return (0);
 }
 
-// int main()
-// {
-// 	void *mlx = mlx_init();
-//     void *win = mlx_new_window(mlx, 640, 360, "Tutorial Window - Create Image");
+int	main(int ac, char **ag)
+{
+	t_fdf	*tab;
 
-//     void *image = mlx_new_image(mlx, 640, 360);
-	
-// 	int pixel_bits;
-// 	int line_bytes;
-// 	int endian;
-// 	char *buffer = mlx_get_data_addr(image, &pixel_bits, &line_bytes, &endian);
-
-
-//     int color = 0xABCDEF;
-
-
-
-// 	for(int y = 0; y < 360; ++y)
-// 		for(int x = 0; x < 640; ++x)
-// 		{
-// 			int pixel = (y * line_bytes) + (x * 4);
-
-// 			if (endian == 1)        // Most significant (Alpha) byte first
-// 			{
-// 				buffer[pixel + 0] = (color >> 24);
-// 				buffer[pixel + 1] = (color >> 16) & 0xFF;
-// 				buffer[pixel + 2] = (color >> 8) & 0xFF;
-// 				buffer[pixel + 3] = (color) & 0xFF;
-// 			}
-// 			else if (endian == 0)   // Least significant (Blue) byte first
-// 			{
-// 				buffer[pixel + 0] = (color) & 0xFF;
-// 				buffer[pixel + 1] = (color >> 8) & 0xFF;
-// 				buffer[pixel + 2] = (color >> 16) & 0xFF;
-// 				buffer[pixel + 3] = (color >> 24);
-// 			}
-// 		}
-// 	mlx_put_image_to_window(mlx, win, image, 0, 0);
-
-
-
-
-
-//     mlx_loop(mlx);
-// }
-// gcc -Wall -Wextra -Werror -I minilibx -L minilibx_macos -lmlx -framework OpenGL -framework AppKit fdf.c main.c parse.c libft/libft.a 
+	if (ac != 2)
+		exit(-1);
+	tab = malloc(sizeof(t_fdf));
+	tab->rotation = 0;
+	tab->h_view = 0.01;
+	tab->h_move = 500;
+	tab->v_move = 50;
+	tab->ag = ag;
+	tab->p_mlx = mlx_init();
+	readfile(tab);
+	tab->p_win = mlx_new_window(tab->p_mlx, 1000, 800, ag[1]);
+	tab->zoom = find_max(1000 / tab->width, 2);
+	show_map(tab);
+	mlx_do_key_autorepeaton(tab->p_mlx);
+	mlx_hook(tab->p_win, 2, (1L << 0), event, tab);
+	mlx_loop(tab->p_mlx);
+}
