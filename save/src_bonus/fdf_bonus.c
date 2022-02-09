@@ -6,7 +6,7 @@
 /*   By: decortejohn <decortejohn@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/02/06 16:54:51 by decortejohn       #+#    #+#             */
-/*   Updated: 2022/02/06 21:45:59 by decortejohn      ###   ########.fr       */
+/*   Updated: 2022/02/09 12:58:01 by decortejohn      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,10 +51,10 @@ void	projection(float *x, float *y, int *z, t_fdf *tab)
 	*x *= tab->zoom;
 	y_tmp = *y;
 	x_tmp = *x;
-	*x = (x_tmp - tab->width * 1.5) * cos(tab->rotation)
-		- (y_tmp - tab->height * 1.5) * sin(tab->rotation);
-	*y = (x_tmp - tab->width * 1.5) * sin(tab->rotation)
-		+ (y_tmp - tab->height * 1.5) * cos(tab->rotation);
+	*x = (x_tmp - 1000 / 2) * cos(tab->rotation)
+		- (y_tmp - 800 / 2) * sin(tab->rotation);
+	*y = (x_tmp - 1000 / 2) * sin(tab->rotation)
+		+ (y_tmp - 800 / 2) * cos(tab->rotation);
 	if (tab->projection == false)
 	{
 		*x = (*x - *y) * cos(0.8);
