@@ -5,8 +5,8 @@
 The 42-FdF project is part of the 42 school's curriculum, focusing on graphics programming. The objective is to develop a program that reads a file containing a grid of height values and generates a 3D wireframe representation of the corresponding landscape. This project enhances understanding of 3D projections, transformations, and the use of graphics libraries in C.
 
 ## Screenshot
-![screenshot](map3.png)
-![screenshot](map0.png)
+![screenshot1](map3.jpg)
+![screenshot2](map0.png)
 
 ## Features
 
